@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "268879835883",
+    "firebase_url": "https://fcm-persional.firebaseio.com",
+    "project_id": "fcm-persional",
+    "storage_bucket": "fcm-persional.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268879835883:android:e17db4b7ee484f3ff584ae",
+        "android_client_info": {
+          "package_name": "com.example.flutter_background_service_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "268879835883-8d9mo77ajpn0hnc2btkjp8u4omtlsv1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxenC_pdBpyOwFXajO8poc4YNNp0XaRcs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "268879835883-8d9mo77ajpn0hnc2btkjp8u4omtlsv1p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
