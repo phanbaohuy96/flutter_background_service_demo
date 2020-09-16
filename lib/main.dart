@@ -1,19 +1,19 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
   if (message.containsKey('data')) {
-    // Handle data message
     final dynamic data = message['data'];
     print('data $data');
   }
 
   if (message.containsKey('notification')) {
-    // Handle notification message
     final dynamic notification = message['notification'];
     print('notification $notification');
   }
-  // Or do other work.
+
   print('message $message');
 }
 
@@ -46,29 +46,49 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String messageEvent;
+  Map<String, dynamic> messageData;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   @override
   void initState() {
     super.initState();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
+        if (mounted) {
+          setState(() {
+            messageData = message;
+            messageEvent = 'onMessage';
+          });
+        }
         print("onMessage: $message");
       },
       onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
+        if (mounted) {
+          setState(() {
+            messageData = message;
+            messageEvent = 'onLaunch';
+          });
+        }
         print("onLaunch: $message");
       },
       onResume: (Map<String, dynamic> message) async {
+        if (mounted) {
+          setState(() {
+            messageData = message;
+            messageEvent = 'onResume';
+          });
+        }
         print("onResume: $message");
       },
     );
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  String get _messageDataJson {
+    JsonEncoder encoder = new JsonEncoder.withIndent('\t\t\t\t');
+    String prettyprint = encoder.convert(messageData ?? "");
+    return prettyprint;
   }
 
   @override
@@ -80,21 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          mainAxisSize: MainAxisSize.max,
+          children: [
             Text(
-              'You have pushed the button this many times:',
+              'Event: $messageEvent',
             ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              '$_messageDataJson',
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
