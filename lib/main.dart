@@ -1,24 +1,34 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
-Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
-  if (message.containsKey('data')) {
-    final dynamic data = message['data'];
-    print('data $data');
-  }
-
-  if (message.containsKey('notification')) {
-    final dynamic notification = message['notification'];
-    print('notification $notification');
-  }
-
-  print('message $message');
+Future<dynamic> backgroundMessageHandler(Map<String, dynamic> message) async {
+  print("coming");
+  Directory directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  Box box = await Hive.openBox("fcm");
+  box.put("fcm", "from Hive ${message.toString()}");
+  print("hello world");
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  Directory directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  await handleBox();
   runApp(MyApp());
+}
+
+Future<void> handleBox() async {
+  Box box = await Hive.openBox("fcm");
+  print("fcm........");
+  print(box.get("fcm"));
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +55,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String messageEvent;
   Map<String, dynamic> messageData;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -63,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         print("onMessage: $message");
       },
-      onBackgroundMessage: myBackgroundMessageHandler,
+      onBackgroundMessage: backgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
         if (mounted) {
           setState(() {
@@ -83,6 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
         print("onResume: $message");
       },
     );
+    _firebaseMessaging.getToken().then((token) {
+      print(token);
+    });
   }
 
   String get _messageDataJson {
